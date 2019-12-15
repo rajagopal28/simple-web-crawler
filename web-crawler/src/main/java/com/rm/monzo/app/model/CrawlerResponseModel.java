@@ -12,4 +12,5 @@ public class CrawlerResponseModel {
     private String currentURL;
     private List<Future<CrawlerResponseModel>> childrenFutures;
     private int currentDepth;
+    private String error;
 }
