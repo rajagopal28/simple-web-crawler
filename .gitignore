@@ -2,15 +2,17 @@
 *.class
 
 # intellij files
-./.idea/*
+.idea/s
+.idea/*.xml
+.idea/libraries/
 */*.iml
 
 # Log file
 *.log
 
 # build files
-./target/
-./web-crawler/target/*
+target/
+web-crawler/target/
 
 # BlueJ files
 *.ctxt
