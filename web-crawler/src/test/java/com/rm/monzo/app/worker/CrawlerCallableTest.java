@@ -269,4 +269,50 @@ public class CrawlerCallableTest {
         Assert.assertEquals(currentURL, response.getCurrentURL());
         Assert.assertEquals(0, response.getChildrenFutures().size());
     }
+
+    @Test
+    public void testMultiCallableInvokingWhenDepthWithinThresholdButEmptyChildLink() throws Exception {
+        Document mockDoc = Mockito.mock(Document.class);
+
+        Elements mockElements = Mockito.mock(Elements.class);
+
+        Element mockElement = Mockito.mock(Element.class);
+
+        String child = "";
+        Mockito.when(mockElement.attr(Mockito.anyString())).thenReturn(child);
+
+        Mockito.when(mockElements.iterator()).thenReturn(Collections.singleton(mockElement).iterator());
+
+        Mockito.when(mockDoc.select(Mockito.anyString())).thenReturn(mockElements);
+
+        PowerMockito.mockStatic(Jsoup.class);
+        ThreadPoolExecutor mockExecutor = Mockito.mock(ThreadPoolExecutor.class);
+
+        Future mockFuture = Mockito.mock(Future.class);
+        Mockito.when(mockExecutor.submit(Mockito.any(CrawlerCallable.class))).thenReturn(mockFuture);
+
+        PowerMockito.when(Jsoup.parse(Mockito.any(URL.class), Mockito.anyInt())).thenReturn(mockDoc);
+
+        ConcurrentSkipListSet<String> crawledSites = new ConcurrentSkipListSet<>();
+        crawledSites.add(child);
+        String currentURL = "http://www.example.com/";
+        CrawlerCallable callable = CrawlerCallable.builder()
+                .executorService(mockExecutor)
+                .depthLimit(2)
+                .currentDepth(1)
+                .isExternalCrawlingAllowed(true)
+                .crawledSites(crawledSites)
+                .currentURL(currentURL)
+                .build();
+        CrawlerResponseModel response = callable.call();
+        System.out.println(crawledSites);
+        Assert.assertFalse(crawledSites.isEmpty());
+        Mockito.verify(mockExecutor, Mockito.never()).submit(Mockito.any(CrawlerCallable.class));
+
+        Mockito.verify(mockDoc).select(Mockito.anyString());
+
+        Assert.assertNotNull(response);
+        Assert.assertEquals(currentURL, response.getCurrentURL());
+        Assert.assertEquals(0, response.getChildrenFutures().size());
+    }
 }
