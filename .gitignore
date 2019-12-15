@@ -1,8 +1,16 @@
 # Compiled class file
 *.class
 
+# intellij files
+./.idea/*
+*/*.iml
+
 # Log file
 *.log
+
+# build files
+./target/
+./web-crawler/target/*
 
 # BlueJ files
 *.ctxt
