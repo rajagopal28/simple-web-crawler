@@ -75,8 +75,8 @@ public class CrawlerCallableTest {
         System.out.println(crawledSites);
         Assert.assertFalse(crawledSites.isEmpty());
         Assert.assertEquals(1, crawledSites.size());
-        Assert.assertTrue(crawledSites.stream().noneMatch(s -> s.equals(currentURL)));
-        Assert.assertTrue(crawledSites.stream().anyMatch(s -> s.equals(child)));
+        Assert.assertTrue(crawledSites.stream().anyMatch(s -> s.equals(currentURL)));
+        Assert.assertTrue(crawledSites.stream().noneMatch(s -> s.equals(child)));
         Mockito.verify(mockExecutor).submit(Mockito.any(CrawlerCallable.class));
 
         Mockito.verify(mockDoc).select(Mockito.anyString());
@@ -124,7 +124,8 @@ public class CrawlerCallableTest {
                 .build();
         CrawlerResponseModel response = callable.call();
         System.out.println(crawledSites);
-        Assert.assertTrue(crawledSites.isEmpty());
+        Assert.assertFalse(crawledSites.isEmpty());
+        Assert.assertTrue(crawledSites.contains(currentURL));
         Mockito.verify(mockExecutor, Mockito.never()).submit(Mockito.any(CrawlerCallable.class));
 
         Mockito.verify(mockDoc).select(Mockito.anyString());
@@ -169,7 +170,8 @@ public class CrawlerCallableTest {
                 .build();
         CrawlerResponseModel response = callable.call();
         System.out.println(crawledSites);
-        Assert.assertTrue(crawledSites.isEmpty());
+        Assert.assertFalse(crawledSites.isEmpty());
+        Assert.assertTrue(crawledSites.contains(currentURL));
         Mockito.verify(mockExecutor, Mockito.never()).submit(Mockito.any(CrawlerCallable.class));
 
         Mockito.verify(mockDoc).select(Mockito.anyString());
@@ -214,7 +216,9 @@ public class CrawlerCallableTest {
                 .build();
         CrawlerResponseModel response = callable.call();
         System.out.println(crawledSites);
-        Assert.assertTrue(crawledSites.isEmpty());
+        Assert.assertFalse(crawledSites.isEmpty());
+        Assert.assertEquals(1, crawledSites.size());
+        Assert.assertTrue(crawledSites.contains(currentURL));
         Mockito.verify(mockExecutor, Mockito.never()).submit(Mockito.any(CrawlerCallable.class));
 
         Mockito.verify(mockDoc).select(Mockito.anyString());

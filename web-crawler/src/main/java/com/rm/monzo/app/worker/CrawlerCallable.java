@@ -29,27 +29,30 @@ public class CrawlerCallable implements Callable<CrawlerResponseModel> {
 
         List<Future<CrawlerResponseModel>> childrenPromises = new ArrayList<>();
 
-        Document document = Jsoup.parse(new URL(currentURL), CrawlerUtil.TEN_SECONDS_IN_MILLIS); // get document with timeouts
-        Elements linksOnPage = document.select(CrawlerUtil.PATTERN_CSS_QUERY_SELECTION);
+        String uniqueURL = CrawlerUtil.getAbsoluteURLWithoutInternalReference(currentURL);
+        if(isValidURLToCrawl(uniqueURL)) { // is external URL restricted
+            Document document = Jsoup.parse(new URL(uniqueURL), CrawlerUtil.TEN_SECONDS_IN_MILLIS); // get document with timeouts
+            Elements linksOnPage = document.select(CrawlerUtil.PATTERN_CSS_QUERY_SELECTION);
+            int newDepth = currentDepth+1;
 
-        int newDepth = currentDepth+1;
+            System.out.println(String.format("Crawled current URL:: %s, currentDepth:: %d, newDepth:: %d", currentURL, currentDepth, newDepth));
 
-        System.out.println(String.format("Crawled current URL:: %s, currentDepth:: %d, newDepth:: %d", currentURL, currentDepth, newDepth));
-
-        if(newDepth <= depthLimit) { // only go if the depth is not restricted
-            for (Element page : linksOnPage) {
-                String childURL = page.attr(CrawlerUtil.ATTRIBUTE_KEY_URL_SELECTION);
-                String URLWithoutInternalReference = CrawlerUtil.getAbsoluteURLWithoutInternalReference(childURL);
-                if(isValidURLToCrawl(URLWithoutInternalReference)) { // is external URL restricted
-                    CrawlerCallable childCallable = CrawlerCallable.builder()
-                            .currentURL(URLWithoutInternalReference)
-                            .executorService(executorService)
-                            .depthLimit(depthLimit)
-                            .currentDepth(newDepth)
-                            .crawledSites(crawledSites)
-                            .build();
-                    crawledSites.add(URLWithoutInternalReference);
-                    childrenPromises.add(executorService.submit(childCallable));
+            crawledSites.add(currentURL);
+            if(newDepth <= depthLimit) { // only go if the depth is not restricted
+                for (Element page : linksOnPage) {
+                    String childURL = page.attr(CrawlerUtil.ATTRIBUTE_KEY_URL_SELECTION);
+                    String URLWithoutInternalReference = CrawlerUtil.getAbsoluteURLWithoutInternalReference(childURL);
+                    if (isValidURLToCrawl(URLWithoutInternalReference)
+                            && checkForExternalURL(URLWithoutInternalReference)) { // is external URL restricted
+                        CrawlerCallable childCallable = CrawlerCallable.builder()
+                                .currentURL(URLWithoutInternalReference)
+                                .executorService(executorService)
+                                .depthLimit(depthLimit)
+                                .currentDepth(newDepth)
+                                .crawledSites(crawledSites)
+                                .build();
+                        childrenPromises.add(executorService.submit(childCallable));
+                    }
                 }
             }
         }
