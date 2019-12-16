@@ -13,6 +13,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
 
@@ -42,10 +43,10 @@ public class CrawlerServiceTest {
 
         CrawlerService crawlerService = new CrawlerService(1, 1);
 
-        BiConsumer<Map, String> consumer = new BiConsumer<Map, String>() {
+        BiConsumer<Map, Optional<String>> consumer = new BiConsumer<Map, Optional<String>>() {
             @Override
-            public void accept(Map map, String s) {
-                Assert.assertNull(s);
+            public void accept(Map map, Optional<String> s) {
+                Assert.assertFalse(s.isPresent());
                 Assert.assertEquals(1, map.size());
                 Assert.assertTrue(map.containsKey(siteURL));
                 List<Map> list = (List<Map>) map.get(siteURL);

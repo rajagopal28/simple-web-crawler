@@ -14,11 +14,11 @@ public class CrawlerService {
     private int depthLimit;
     private int threadPoolLimit;
 
-    public void crawlSite(String siteURL, BiConsumer<Map, String> consumer) {
+    public void crawlSite(String siteURL, BiConsumer<Map, Optional<String>> consumer) {
         ExecutorService executorService = Executors.newFixedThreadPool(threadPoolLimit);
         System.out.println(executorService);
         Map<String, List> result = new HashMap<>();
-        String errorMsg = null;
+        Optional<String> errorMsg = Optional.empty();
         try {
             CrawlerCallable masterCallable = CrawlerCallable.builder()
                     .currentDepth(1)
@@ -30,7 +30,7 @@ public class CrawlerService {
             result.put(siteURL, handleRecursiveCrawls(Collections.singletonList(executorService.submit(masterCallable))));
             System.out.println("Crawly!!");
         } catch (Exception ie) {
-            errorMsg = ie.getMessage();
+            errorMsg = Optional.of(ie.getMessage());
             ie.printStackTrace();
             // only the top most one??
         } finally {
