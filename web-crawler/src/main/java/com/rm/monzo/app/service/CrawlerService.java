@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @AllArgsConstructor
 public class CrawlerService {
@@ -15,6 +17,7 @@ public class CrawlerService {
     private int threadPoolLimit;
     private boolean isExternalCrawlingAllowed;
     private static final String KEY_ERROR = "error";
+    private static Logger logger = Logger.getLogger(CrawlerService.class.getCanonicalName());
 
     public void crawlSite(String siteURL, BiConsumer<Map, Optional<String>> consumer) {
         ExecutorService executorService = Executors.newFixedThreadPool(threadPoolLimit);
@@ -32,7 +35,7 @@ public class CrawlerService {
             result.put(siteURL, handleRecursiveCrawls(Collections.singletonList(executorService.submit(masterCallable))));
         } catch (Exception ie) {
             errorMsg = Optional.of(ie.getMessage());
-            ie.printStackTrace();
+            logger.log(Level.SEVERE, ie.getMessage(), ie);
             // only the top most one??
         } finally {
             executorService.shutdown();
@@ -40,22 +43,25 @@ public class CrawlerService {
                 // just wait in mainthread for executors to complete
             }
             if(result.containsKey(KEY_ERROR)) {
-                errorMsg = Optional.of(result.get(KEY_ERROR).toString());
+                String errorString = result.get(KEY_ERROR).toString();
+                errorMsg = Optional.of(errorString);
+                logger.severe(errorString);
             }
+            logger.info("Invoking consumer with data");
             consumer.accept(result, errorMsg);
         }
     }
 
 
     private List<Map> handleRecursiveCrawls(List<Future<CrawlerResponseModel>> futures) {
-        System.out.println("Starting handleRecursiveCrawls.");
+        logger.info("Starting handleRecursiveCrawls.");
         List<Map> parents = new ArrayList<>();
         for (Future<CrawlerResponseModel> future : futures) {
             Map<String, List<Map>> parentResponse = new HashMap<>();
             try {
                 CrawlerResponseModel crawlerResponseModel = future.get();
                 List<Map> children = new ArrayList<>();
-                System.out.println("crawlerResponseModel.getCurrentURL():::" + crawlerResponseModel.getCurrentURL());
+                logger.info("crawlerResponseModel.getCurrentURL():::" + crawlerResponseModel.getCurrentURL());
                 List<Future<CrawlerResponseModel>> childrenFutures = crawlerResponseModel.getChildrenFutures();
                 if(!childrenFutures.isEmpty()) {
                     children.addAll(handleRecursiveCrawls(childrenFutures));
@@ -72,7 +78,7 @@ public class CrawlerService {
                 parentResponse.put(KEY_ERROR, errorMap);
             }
         }
-        System.out.println("Ending handleRecursiveCrawls.");
+        logger.info("Ending handleRecursiveCrawls.");
         return parents;
     }
 }
