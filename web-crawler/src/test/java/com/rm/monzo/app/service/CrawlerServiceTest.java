@@ -41,7 +41,7 @@ public class CrawlerServiceTest {
         PowerMockito.mockStatic(Executors.class);
         PowerMockito.when(Executors.newFixedThreadPool(Mockito.eq(1))).thenReturn(mockExecutor);
 
-        CrawlerService crawlerService = new CrawlerService(1, 1);
+        CrawlerService crawlerService = new CrawlerService(1, 1, false);
 
         BiConsumer<Map, Optional<String>> consumer = new BiConsumer<Map, Optional<String>>() {
             @Override

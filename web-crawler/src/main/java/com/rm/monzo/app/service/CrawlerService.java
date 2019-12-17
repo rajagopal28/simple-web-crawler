@@ -13,6 +13,7 @@ public class CrawlerService {
 
     private int depthLimit;
     private int threadPoolLimit;
+    private boolean isExternalCrawlingAllowed;
 
     public void crawlSite(String siteURL, BiConsumer<Map, Optional<String>> consumer) {
         ExecutorService executorService = Executors.newFixedThreadPool(threadPoolLimit);
@@ -26,6 +27,7 @@ public class CrawlerService {
                     .executorService(executorService)
                     .crawledSites(new ConcurrentSkipListSet<>())
                     .currentURL(siteURL)
+                    .isExternalCrawlingAllowed(isExternalCrawlingAllowed)
                     .build();
             result.put(siteURL, handleRecursiveCrawls(Collections.singletonList(executorService.submit(masterCallable))));
             System.out.println("Crawly!!");

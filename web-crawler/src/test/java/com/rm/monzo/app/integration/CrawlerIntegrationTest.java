@@ -22,7 +22,7 @@ public class CrawlerIntegrationTest {
         TestStubUtil.stubURIWithFilename("/page3", "page3.html");
         TestStubUtil.stubURIWithFilename("/page4", "page4.html");
 
-        CrawlerService crawlerService = new CrawlerService(4, 10);
+        CrawlerService crawlerService = new CrawlerService(4, 10, false);
         crawlerService.crawlSite("http://127.0.0.1:8065/", (s, e) -> {
             Assert.assertFalse(e.isPresent());
             System.out.println(s);
