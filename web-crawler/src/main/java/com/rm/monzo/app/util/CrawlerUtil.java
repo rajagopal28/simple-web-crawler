@@ -14,7 +14,7 @@ public interface CrawlerUtil {
     String UI_ENTER_URL_LABEL = "Enter URL:";
     int UI_FRAME_WIDTH = 1000;
     int UI_FRAME_HEIGHT = 700;
-    String UI_DEFAULT_CRAWL_URL_VALUE = "https://www.google.com/s";
+    String UI_DEFAULT_CRAWL_URL_VALUE = "https://www.google.com/";
     String UI_DEPTH_LABEL = "Depth:";
     String UI_CRAWL_BUTTON_LABEL = "Crawl";
     String UI_RADIO_BUTTON_LABEL = "Allow External link Crawling?";

@@ -1,5 +1,8 @@
 package com.rm.monzo.app;
 
+import com.rm.monzo.app.service.CrawlerService;
+import com.rm.monzo.app.util.CrawlerUtil;
+
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
@@ -8,10 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-
-import com.rm.monzo.app.util.CrawlerUtil;
-
-import com.rm.monzo.app.service.CrawlerService;
 
 public class CrawlerApplication {
     public static void main(String... args) {

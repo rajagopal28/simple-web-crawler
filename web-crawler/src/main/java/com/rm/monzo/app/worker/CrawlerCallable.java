@@ -11,7 +11,11 @@ import org.jsoup.select.Elements;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.logging.Logger;
 
 @Builder
 public class CrawlerCallable implements Callable<CrawlerResponseModel> {
@@ -23,9 +27,11 @@ public class CrawlerCallable implements Callable<CrawlerResponseModel> {
     private boolean isExternalCrawlingAllowed;
     private ConcurrentSkipListSet<String> crawledSites;
 
+    private static Logger logger = Logger.getLogger(CrawlerCallable.class.getCanonicalName());
+
 
     public CrawlerResponseModel call() throws Exception {
-        System.out.println(Thread.currentThread().getName());
+        logger.info(Thread.currentThread().getName());
 
         List<Future<CrawlerResponseModel>> childrenPromises = new ArrayList<>();
 
@@ -36,7 +42,7 @@ public class CrawlerCallable implements Callable<CrawlerResponseModel> {
             Elements linksOnPage = document.select(CrawlerUtil.PATTERN_CSS_QUERY_SELECTION);
             int newDepth = currentDepth+1;
 
-            System.out.println(String.format("Crawled current URL:: %s, currentDepth:: %d, newDepth:: %d", currentURL, currentDepth, newDepth));
+            logger.info(String.format("Crawled current URL:: %s, currentDepth:: %d, newDepth:: %d", currentURL, currentDepth, newDepth));
             if(newDepth <= depthLimit) { // only go if the depth is not restricted
                 for (Element page : linksOnPage) {
                     String childURL = page.attr(CrawlerUtil.ATTRIBUTE_KEY_URL_SELECTION);

@@ -14,10 +14,10 @@ public class CrawlerService {
     private int depthLimit;
     private int threadPoolLimit;
     private boolean isExternalCrawlingAllowed;
+    private static final String KEY_ERROR = "error";
 
     public void crawlSite(String siteURL, BiConsumer<Map, Optional<String>> consumer) {
         ExecutorService executorService = Executors.newFixedThreadPool(threadPoolLimit);
-        System.out.println(executorService);
         Map<String, List> result = new HashMap<>();
         Optional<String> errorMsg = Optional.empty();
         try {
@@ -30,7 +30,6 @@ public class CrawlerService {
                     .isExternalCrawlingAllowed(isExternalCrawlingAllowed)
                     .build();
             result.put(siteURL, handleRecursiveCrawls(Collections.singletonList(executorService.submit(masterCallable))));
-            System.out.println("Crawly!!");
         } catch (Exception ie) {
             errorMsg = Optional.of(ie.getMessage());
             ie.printStackTrace();
@@ -39,6 +38,9 @@ public class CrawlerService {
             executorService.shutdown();
             while (!executorService.isTerminated()) {
                 // just wait in mainthread for executors to complete
+            }
+            if(result.containsKey(KEY_ERROR)) {
+                errorMsg = Optional.of(result.get(KEY_ERROR).toString());
             }
             consumer.accept(result, errorMsg);
         }
@@ -62,7 +64,12 @@ public class CrawlerService {
                 parents.add(parentResponse);
             } catch (InterruptedException | ExecutionException ie){
                 ie.printStackTrace();
-                // just log??
+                // construct a nested error map
+                List<Map> errorMap = parentResponse.getOrDefault(KEY_ERROR, new ArrayList<>());
+                Map<String, String> error= new HashMap<>();
+                error.put(KEY_ERROR, ie.getMessage());
+                errorMap.add(error);
+                parentResponse.put(KEY_ERROR, errorMap);
             }
         }
         System.out.println("Ending handleRecursiveCrawls.");
