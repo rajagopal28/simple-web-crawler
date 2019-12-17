@@ -31,13 +31,12 @@ public class CrawlerCallable implements Callable<CrawlerResponseModel> {
 
         String uniqueURL = CrawlerUtil.getAbsoluteURLWithoutInternalReference(currentURL);
         if(isValidURLToCrawl(uniqueURL)) { // is external URL restricted
+            crawledSites.add(currentURL);
             Document document = Jsoup.parse(new URL(uniqueURL), CrawlerUtil.TEN_SECONDS_IN_MILLIS); // get document with timeouts
             Elements linksOnPage = document.select(CrawlerUtil.PATTERN_CSS_QUERY_SELECTION);
             int newDepth = currentDepth+1;
 
             System.out.println(String.format("Crawled current URL:: %s, currentDepth:: %d, newDepth:: %d", currentURL, currentDepth, newDepth));
-
-            crawledSites.add(currentURL);
             if(newDepth <= depthLimit) { // only go if the depth is not restricted
                 for (Element page : linksOnPage) {
                     String childURL = page.attr(CrawlerUtil.ATTRIBUTE_KEY_URL_SELECTION);

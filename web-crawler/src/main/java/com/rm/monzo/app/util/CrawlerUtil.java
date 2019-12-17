@@ -6,6 +6,7 @@ public interface CrawlerUtil {
     String URL_REMOVABLE_PROTOCOL_PATTERN = "http[s]?://";
     String URL_REMOVABLE_URL_PATH_DELIMITER = "/";
     String URL_REMOVABLE_URL_INTERNAL_LINK_DELIMITER = "#";
+    String URL_REMOVABLE_URL_PARAM_DELIMITER = "\\?";
     String REPLACEABLE_EMPTY_STRING = "";
     int TEN_SECONDS_IN_MILLIS = 10000;
 
@@ -37,7 +38,12 @@ public interface CrawlerUtil {
     }
 
     static String getAbsoluteURLWithoutInternalReference(String urlString) {
-        return urlString.split(URL_REMOVABLE_URL_INTERNAL_LINK_DELIMITER)[0];
+        return getAbsoluteURLWithoutQueryParams(urlString.split(URL_REMOVABLE_URL_INTERNAL_LINK_DELIMITER)[0]);
+
+    }
+
+    static String getAbsoluteURLWithoutQueryParams(String urlString) {
+        return urlString.split(URL_REMOVABLE_URL_PARAM_DELIMITER)[0];
 
     }
 }
