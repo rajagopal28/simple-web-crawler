@@ -12,11 +12,12 @@ public interface CrawlerUtil {
 
     String UI_INTERFACE_TITLE = "Web Crawler Interface";
     String UI_ENTER_URL_LABEL = "Enter URL:";
-    int UI_FRAME_WIDTH = 800;
-    int UI_FRAME_HEIGHT = 600;
+    int UI_FRAME_WIDTH = 1000;
+    int UI_FRAME_HEIGHT = 700;
     String UI_DEFAULT_CRAWL_URL_VALUE = "https://www.google.com/s";
     String UI_DEPTH_LABEL = "Depth:";
     String UI_CRAWL_BUTTON_LABEL = "Crawl";
+    String UI_RADIO_BUTTON_LABEL = "Allow External link Crawling?";
     String UI_TREE_ROOT_NOTE_TEXT = "Crawled Sites";
     String UI_DEFAULT_DEPTH_VALUE = "5";
     int UI_URL_FIELD_MAX_LENGTH = 40;

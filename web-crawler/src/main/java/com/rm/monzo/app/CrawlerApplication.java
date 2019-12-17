@@ -29,6 +29,7 @@ public class CrawlerApplication {
         JTextField urlTextField = new JTextField(CrawlerUtil.UI_DEFAULT_CRAWL_URL_VALUE, CrawlerUtil.UI_URL_FIELD_MAX_LENGTH); // accepts upto 10 characters
         JLabel depthLabel = new JLabel(CrawlerUtil.UI_DEPTH_LABEL);
         JTextField depthText = new JTextField(CrawlerUtil.UI_DEFAULT_DEPTH_VALUE, CrawlerUtil.UI_DEPTH_FIELD_MAX_LENGTH); // accepts upto 10 characters
+        JRadioButton externalCrawlFlag = new JRadioButton(CrawlerUtil.UI_RADIO_BUTTON_LABEL);
         JButton crawlButton = new JButton(CrawlerUtil.UI_CRAWL_BUTTON_LABEL);
 
         inputPanel.add(urlLabel); // Components Added using Flow Layout
@@ -36,6 +37,7 @@ public class CrawlerApplication {
 
         inputPanel.add(depthLabel); // Components Added using Flow Layout
         inputPanel.add(depthText);
+        inputPanel.add(externalCrawlFlag);
         inputPanel.add(crawlButton);
 
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(CrawlerUtil.UI_TREE_ROOT_NOTE_TEXT);
@@ -46,8 +48,9 @@ public class CrawlerApplication {
         JLabel statusValueLabel = new JLabel(CrawlerUtil.UI_STATUS_VALUE_NONE_TEXT, SwingConstants.CENTER);
         crawlButton.addActionListener((l) -> {
             statusValueLabel.setText(CrawlerUtil.UI_STATUS_VALUE_CRAWLING_TEXT);
+            boolean isExternalCrawlingAllowed = externalCrawlFlag.isSelected();
             siteMapTree.clearSelection();
-            crawl(urlTextField.getText(), Integer.valueOf(depthText.getText()), (r, e) -> {
+            crawl(urlTextField.getText(), Integer.valueOf(depthText.getText()), isExternalCrawlingAllowed, (r, e) -> {
                 if(e.isPresent()) {
                     statusValueLabel.setText(CrawlerUtil.UI_STATUS_ERROR_LABEL + e.get());
                 } else {
@@ -71,9 +74,9 @@ public class CrawlerApplication {
         mainFrame.setVisible(true);
     }
 
-    static void crawl(String s, int depth, BiConsumer<Map, Optional<String>> consumer){
+    static void crawl(String s, int depth, boolean isExternalCrawlingAllowed, BiConsumer<Map, Optional<String>> consumer){
         // "https://docs.oracle.com/javase/tutorial/uiswing/components/tree.html";
-        CrawlerService service = new CrawlerService(depth, 100);
+        CrawlerService service = new CrawlerService(depth, 100, isExternalCrawlingAllowed);
         service.crawlSite(s, consumer);
     }
 
