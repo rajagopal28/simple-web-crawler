@@ -60,7 +60,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.williamheng.monzocrawler.MonzoCrawlerApplication</mainClass>
+                            <mainClass>com.rm.monzo.app.CrawlerApplication</mainClass>
                         </manifest>
                         <!--<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>-->
                     </archive>
