@@ -2,7 +2,7 @@
 *.class
 
 # intellij files
-.idea/s
+.idea/
 .idea/*.xml
 .idea/libraries/
 */*.iml
