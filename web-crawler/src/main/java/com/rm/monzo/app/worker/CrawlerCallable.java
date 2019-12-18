@@ -54,6 +54,7 @@ public class CrawlerCallable implements Callable<CrawlerResponseModel> {
                                 .executorService(executorService)
                                 .depthLimit(depthLimit)
                                 .currentDepth(newDepth)
+                                .isExternalCrawlingAllowed(isExternalCrawlingAllowed)
                                 .crawledSites(crawledSites)
                                 .build();
                         childrenPromises.add(executorService.submit(childCallable));
