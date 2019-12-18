@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.rm.monzo.app.service.CrawlerService;
 import com.rm.monzo.app.util.TestStubUtil;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -15,13 +16,15 @@ public class CrawlerIntegrationTest {
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.wireMockConfig().port(8065));
 
-    @Test
-    public void crawlURLSameDomainOnly() throws Exception {
+    @Before
+    public void setupSite() {
         TestStubUtil.stubURIWithFilename("/", "index.html");
         TestStubUtil.stubURIWithFilename("/page2", "page2.html");
         TestStubUtil.stubURIWithFilename("/page3", "page3.html");
         TestStubUtil.stubURIWithFilename("/page4", "page4.html");
-
+    }
+    @Test
+    public void crawlURLSameDomainOnly() throws Exception {
         CrawlerService crawlerService = new CrawlerService(4, 10, false);
         crawlerService.crawlSite("http://127.0.0.1:8065/", (s, e) -> {
             Assert.assertFalse(e.isPresent());
@@ -55,11 +58,6 @@ public class CrawlerIntegrationTest {
 
     @Test
     public void crawlURLExternalDomainAllowed() throws Exception {
-        TestStubUtil.stubURIWithFilename("/", "index.html");
-        TestStubUtil.stubURIWithFilename("/page2", "page2.html");
-        TestStubUtil.stubURIWithFilename("/page3", "page3.html");
-        TestStubUtil.stubURIWithFilename("/page4", "page4.html");
-
         CrawlerService crawlerService = new CrawlerService(3, 10, true);
         crawlerService.crawlSite("http://127.0.0.1:8065/", (s, e) -> {
             Assert.assertFalse(e.isPresent());
