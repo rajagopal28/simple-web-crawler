@@ -48,6 +48,9 @@ public class CrawlerIntegrationTest {
             List<Map> firstGGChild = (List<Map>)secondGChild.get("http://127.0.0.1:8065/page2");
             List<Map> secondGGChild = (List<Map>)thirdGChild.get("http://127.0.0.1:8065/page3");
             List<Map> thirdGGChild = (List<Map>)fourthGChild.get("http://127.0.0.1:8065/page4");
+            System.out.println(firstGGChild);
+            System.out.println(secondGGChild);
+            System.out.println(thirdGGChild);
             Assert.assertTrue(firstGGChild.isEmpty());
             Assert.assertTrue(secondGGChild.isEmpty());
             Assert.assertTrue(thirdGGChild.isEmpty());
@@ -81,6 +84,9 @@ public class CrawlerIntegrationTest {
             List<Map> firstGGChild = (List<Map>)secondGChild.get("http://127.0.0.1:8065/page2");
             List<Map> secondGGChild = (List<Map>)thirdGChild.get("http://127.0.0.1:8065/page3");
             List<Map> thirdGGChild = (List<Map>)fourthGChild.get("http://127.0.0.1:8065/page4");
+            System.out.println(firstGGChild);
+            System.out.println(secondGGChild);
+            System.out.println(thirdGGChild);
             Assert.assertFalse(firstGGChild.isEmpty());
             Assert.assertTrue(secondGGChild.isEmpty());
             Assert.assertFalse(thirdGGChild.isEmpty());

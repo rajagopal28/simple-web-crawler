@@ -68,7 +68,7 @@ public class CrawlerService {
                 }
                 parentResponse.put(crawlerResponseModel.getCurrentURL(), children);
                 parents.add(parentResponse);
-            } catch (InterruptedException | ExecutionException ie){
+            } catch (Exception ie){
                 ie.printStackTrace();
                 // construct a nested error map
                 List<Map> errorMap = parentResponse.getOrDefault(KEY_ERROR, new ArrayList<>());
