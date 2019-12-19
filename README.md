@@ -8,7 +8,8 @@ Following is the data flow indicating, how the web crawling works in the given a
 
 ## Approach taken
 Web crawling is an intensive task, especially when it involves multilevel links on huge websites, however the task does not involve complex computations. Given that java provides multi-threaded program execution inside JVM we can make use of the various ExecutorServices available under `java.util.concurrent` package. 
-- Given that the multi-threading is a great power it obviously comes with a responsibility of optimally using the resources, such as sharable thread resources, the execution environment and the processing overheads. In order to make use of resources optimally, I have chosen the FixedThreadPool approach where the Threads are put back tto the pool once their task gets completed.
+- Given that the multi-threading is a great power it obviously comes with a responsibility of optimally using the resources, such as sharable thread resources, the execution environment and the processing overheads. In order to make use of resources optimally, I have chosen the FixedThreadPool approach where the Threads are put back to the pool once their task gets completed.
+
 ![Thread Pool](./images/thread-pool.png)
 - Making use of the FunctionalInterface paradigm available under `java.util.function` package to leverage Async processing in the way that javascript's promises work eg. `java.util.function.BiConsumer` to make obtain the response when the entire crawling process is completed in an asyc ways such that there is no wait in the main thread to synchronously wait after calling the `CrawlerService.crawlSite(<>)` method.
 - Handling internal references(with #) and query params(?param=value) on the same URL such that same URL with different internal redirection or queryParams does not get crawled twice unnecessarily.
@@ -18,6 +19,7 @@ Web crawling is an intensive task, especially when it involves multilevel links 
 
 ## TDD 
 TDD has been enforced at every stage of the implementation. I have also tried to exercise the text pyramid where I have also tried to stub and perform integration testing of the application.
+
 ![TDD Diagram](./images/red-green-refactor.png)
 
 ## Views
@@ -36,9 +38,9 @@ Following are the simple depiction of the web crawler application.
 
 ## Known issues
 - Concurrency comes with its own catch. Following are few of the issues I haves identified as part of the application.
-    - No guarantee in the order of execution. Given that each worker thread execution time depends on the size of the document(WebPage) downloaded and the number of children links present in it. For instance consider 2 children at same level which are spawned in a millisecond difference from each other. If the 2nd child takes less processing time and has the same child link as the 1st one, then the link(GrandChild) has more changes of getting inserted into the hierarchy twice.
-    - Even though I have made use of `java.util.concurrent.ConcurrentSkipListSet` to keep track of the crawled links. There are chances due to the above issue that a link get added twice when 2 concurrent threads call the `ConcurrentSkipListSet.contains(<>)`  method at the same time to get `false` and then making an interleaved call of `ConcurrentSkipListSet.add(<>)` with the same child link.
-    - I have also seen a bottle neck due to concurrency in the below code as **executorService** is being passed to all the worker threads. Concurrent access of it creates locking and unlocking of it as a shared resource across all the threads trying to submit their child link workers. However, I have also noticed that the `executorService.submit(childCallable)` call is better in performance than `executorService.invokeAll(childCallableList)` since this waits for all the children to be alloted a thread while the submit method just uses **Fire And Forget Strategy**
+    - No guarantee in the order of execution. Given that each worker thread execution time depends on the size of the document(WebPage) downloaded and the number of children links present in it. For instance consider 2 children at same level which are spawned in a millisecond difference from each other. If the 2nd child takes less processing time and has the same child link as the 1st one, then the link(GrandChild) has more chances of getting inserted into the hierarchy twice.
+    - Even though I have made use of `java.util.concurrent.ConcurrentSkipListSet` to keep track of the crawled links. There are chances due to the above issue that a link gets added twice when 2 concurrent threads call the `ConcurrentSkipListSet.contains(<>)`  method at the same time to get `false` and then making an interleaved call of `ConcurrentSkipListSet.add(<>)` with the same child link.
+    - I have also seen a bottle neck due to concurrency in the below code as **executorService** is being passed to all the worker threads. Concurrent access of it creates locking and unlocking of it as a shared resource across all the threads trying to submit their child link workers. However, I have also noticed that the `executorService.submit(childCallable)` call is better in performance than `executorService.invokeAll(childCallableList)` since this waits for all the children to be allotted a thread while the submit method just uses **Fire And Forget Strategy**
     ` childrenPromises.add(executorService.submit(childCallable));` 
     
 ## Dependencies
