@@ -17,6 +17,8 @@ Web crawling is an intensive task, especially when it involves multilevel links 
 - jsoup to handle HTML parsing. Given that jsoup internally used JettyHTTPClient to get HTML based web pages, it was really helpful in taking the responsibility of handling the underlying nuances in dealing with HTTP based web requests.
 - JavaSwing - inbuilt UI capability provided by Java SDE to provide simple yet sophisticated interfaces to process information.
     - JTree - Nested tree structure to render the crawled site response.
+- Mockito and PowerMockito for mock based Unit Testing.
+- WireMock framework for integration testing using stub and test approach.
 
 ## TDD 
 TDD has been enforced at every stage of the implementation. I have also tried to exercise the text pyramid where I have also tried to stub and perform integration testing of the application.
