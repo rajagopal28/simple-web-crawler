@@ -14,6 +14,7 @@ Web crawling is an intensive task, especially when it involves multilevel links 
 - Making use of the FunctionalInterface paradigm available under `java.util.function` package to leverage Async processing in the way that javascript's promises work eg. `java.util.function.BiConsumer` to make obtain the response when the entire crawling process is completed in an asyc ways such that there is no wait in the main thread to synchronously wait after calling the `CrawlerService.crawlSite(<>)` method.
 - Handling internal references(with #) and query params(?param=value) on the same URL such that same URL with different internal redirection or queryParams does not get crawled twice unnecessarily.
 - Configurable depth and ability to crawl external sites or sites with different domain origin added as references in the given site.
+- jsoup to handle HTML parsing. Given that jsoup internally used JettyHTTPClient to get HTML based web pages, it was really helpful in taking the responsibility of handling the underlying nuances in dealing with HTTP based web requests.
 - JavaSwing - inbuilt UI capability provided by Java SDE to provide simple yet sophisticated interfaces to process information.
     - JTree - Nested tree structure to render the crawled site response.
 
