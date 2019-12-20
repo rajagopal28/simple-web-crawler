@@ -16,12 +16,12 @@ public class CrawlerService {
     private int depthLimit;
     private int threadPoolLimit;
     private boolean isExternalCrawlingAllowed;
-    private static final String KEY_ERROR = "error";
     private static Logger logger = Logger.getLogger(CrawlerService.class.getCanonicalName());
 
     public void crawlSite(String siteURL, BiConsumer<Map, Optional<String>> consumer) {
         ExecutorService executorService = Executors.newFixedThreadPool(threadPoolLimit);
         Map<String, List> result = new HashMap<>();
+        List<String> errorList = new ArrayList<>();
         Optional<String> errorMsg = Optional.empty();
         try {
             CrawlerCallable masterCallable = CrawlerCallable.builder()
@@ -32,7 +32,8 @@ public class CrawlerService {
                     .currentURL(siteURL)
                     .isExternalCrawlingAllowed(isExternalCrawlingAllowed)
                     .build();
-            result.put(siteURL, handleRecursiveCrawls(Collections.singletonList(executorService.submit(masterCallable))));
+            List<Map> resultList = handleRecursiveCrawls(Collections.singletonList(executorService.submit(masterCallable)), errorList);
+            result.put(siteURL, resultList);
         } catch (Exception ie) {
             errorMsg = Optional.of(ie.getMessage());
             logger.log(Level.SEVERE, ie.getMessage(), ie);
@@ -42,10 +43,9 @@ public class CrawlerService {
             while (!executorService.isTerminated()) {
                 // just wait in mainthread for executors to complete
             }
-            if(result.containsKey(KEY_ERROR)) {
-                String errorString = result.get(KEY_ERROR).toString();
-                errorMsg = Optional.of(errorString);
-                logger.severe(errorString);
+            if(!errorList.isEmpty()) {
+                errorMsg = Optional.of(errorList.toString());
+                logger.severe(errorList.toString());
             }
             logger.info("Invoking consumer with data");
             consumer.accept(result, errorMsg);
@@ -53,7 +53,7 @@ public class CrawlerService {
     }
 
 
-    private List<Map> handleRecursiveCrawls(List<Future<CrawlerResponseModel>> futures) {
+    private List<Map> handleRecursiveCrawls(List<Future<CrawlerResponseModel>> futures, List<String> errorList) {
         logger.info("Starting handleRecursiveCrawls.");
         List<Map> parents = new ArrayList<>();
         for (Future<CrawlerResponseModel> future : futures) {
@@ -64,18 +64,14 @@ public class CrawlerService {
                 logger.info("crawlerResponseModel.getCurrentURL():::" + crawlerResponseModel.getCurrentURL());
                 List<Future<CrawlerResponseModel>> childrenFutures = crawlerResponseModel.getChildrenFutures();
                 if(!childrenFutures.isEmpty()) {
-                    children.addAll(handleRecursiveCrawls(childrenFutures));
+                    children.addAll(handleRecursiveCrawls(childrenFutures, errorList));
                 }
                 parentResponse.put(crawlerResponseModel.getCurrentURL(), children);
                 parents.add(parentResponse);
             } catch (Exception ie){
-                ie.printStackTrace();
+                logger.log(Level.SEVERE, ie.getMessage(), ie);
                 // construct a nested error map
-                List<Map> errorMap = parentResponse.getOrDefault(KEY_ERROR, new ArrayList<>());
-                Map<String, String> error= new HashMap<>();
-                error.put(KEY_ERROR, ie.getMessage());
-                errorMap.add(error);
-                parentResponse.put(KEY_ERROR, errorMap);
+                errorList.add(ie.getMessage());
             }
         }
         logger.info("Ending handleRecursiveCrawls.");
